@@ -2,8 +2,16 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import Login from "./Login";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider";
 
 function Navabar() {
+
+
+const[authUser,setAuthUser] = useAuth()
+console.log(authUser)
+
+
+
     const [theme, setTheme] = useState(localStorage.getItem("theme") ? localStorage.getItem("theme") : "light")
     const element = document.documentElement;
     useEffect(() => {

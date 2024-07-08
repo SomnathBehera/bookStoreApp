@@ -3,6 +3,7 @@ import Home from '../../Frontend/src/home/Home.jsx'
 import Courses from '../../Frontend/src/courses/Courses.jsx'
 import Signup from './componets/Signup.jsx'
 import { Route, Routes } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
@@ -13,6 +14,13 @@ function App() {
           <Route path='/courses' element={<Courses />} />
           <Route path='/signup' element={<Signup />} />
         </Routes>
+        <Toaster
+        position="top-right"
+        reverseOrder={false}
+        containerClassName="custom-toaster"
+      />
+
+
       </div>
 
     </>

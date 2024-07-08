@@ -7,7 +7,7 @@ import list from '../../public/list.json'
 function Courses() {
   console.log(list)
   return (
-    <>
+    <>  
       <Navabar />
       <div className=" min-h-screen">
         <Course />

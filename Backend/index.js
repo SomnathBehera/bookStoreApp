@@ -1,27 +1,36 @@
-import express from "express"
-import dotenv from "dotenv"
+import express from "express";
+import dotenv from "dotenv";
 import mongoose from "mongoose";
-import bookRoute from "./route/book.route.js"
-const app = express()
+import cors from "cors"; // Importing cors
+import bookRoute from "./route/book.route.js";
+import userRout from "./route/user.rout.js"
+
 dotenv.config();
+
+const app = express(); // Initializing app
 
 const PORT = process.env.PORT || 4000;
 const URI = process.env.MongoDBURI;
 
-try {
-    mongoose.connect(URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    });
-    console.log("Connected to mango db");
+// Middleware
+app.use(cors()); // Use cors middleware
+app.use(express.json()); // Use express json parser middleware
 
-} catch (error) {
-console.log("Error",error)
-}
+const connectDB = async () => {
+  try {
+    await mongoose.connect(URI);
+    console.log("Connected to MongoDB");
+  } catch (error) {
+    console.log("Error", error);
+  }
+};
 
+connectDB();
 
-//defining routs
-app.use("/book", bookRoute)
+// Defining routes
+app.use("/book", bookRoute);
+app.use("/user", userRout);
+
 app.listen(PORT, () => {
-    console.log(`Example app listening on port ${PORT}`)
-})
+  console.log(`Example app listening on port ${PORT}`);
+});

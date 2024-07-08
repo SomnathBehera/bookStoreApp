@@ -11,3 +11,6 @@ font-family: 'poppins', sans-serif;
 .margin-top-4{
     margin-top: 4rem;
 }
+.custom-toaster {
+    z-index: 9999; /* or any high value you prefer */
+  }
