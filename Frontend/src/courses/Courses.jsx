@@ -1,21 +1,17 @@
-import React from 'react'
-import Navabar from '../componets/Navabar'
-import Course from '../componets/Course'
-import Footer from '../componets/Footer'
-import list from '../../public/list.json'
-
+import React from "react";
+import Navbar from "../components/Navbar";
+import Course from "../components/Course";
+import Footer from "../components/Footer";
 function Courses() {
-  console.log(list)
   return (
-    <>  
-      <Navabar />
+    <>
+      <Navbar />
       <div className=" min-h-screen">
         <Course />
       </div>
       <Footer />
     </>
-
-  )
+  );
 }
 
-export default Courses
+export default Courses;
