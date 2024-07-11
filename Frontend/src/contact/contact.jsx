@@ -7,7 +7,7 @@ function Contact() {
   return (
     <>
       <Navbar />
-      <ContactForm />
+     <ContactForm />
       <Footer />
     </>
   );

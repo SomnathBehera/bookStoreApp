@@ -1,6 +1,7 @@
 import User from "../model/user.model.js";
+import Conatct from "../model/contact.model.js";
 import bcryptjs from "bcryptjs";
-export const signup = async(req, res) => {
+export const signup = async (req, res) => {
     try {
         const { fullname, email, password } = req.body;
         const user = await User.findOne({ email });
@@ -9,7 +10,7 @@ export const signup = async(req, res) => {
         }
         const hashPassword = await bcryptjs.hash(password, 10);
         const createdUser = new User({
-            fullname: fullname,
+            fullname: req.body,
             email: email,
             password: hashPassword,
         });
@@ -27,7 +28,9 @@ export const signup = async(req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
-export const login = async(req, res) => {
+
+
+export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
@@ -49,3 +52,26 @@ export const login = async(req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
+export const submit = async (req, res) => {
+    try {
+        const { fullname, companyname, email, phnumber, message } = req.body;
+        console.log("sddsdsdsdsd",req.body);
+        const createdUserContact = new Conatct({
+            fullname,
+            companyname,
+            email,
+            phnumber,
+            message
+        });
+        console.log("erewrqea",createdUserContact)
+        await createdUserContact.save();
+        res.status(201).json({
+            message: "Thanks For Contacting Us",
+        });
+    } catch (error) {
+        console.log("Error: " + error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+

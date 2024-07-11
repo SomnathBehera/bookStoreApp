@@ -2,10 +2,10 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+// import contactRoute from "./route/contact.rout.js";
 
 import bookRoute from "./route/book.route.js";
 import userRoute from "./route/user.route.js";
-
 const app = express();
 
 app.use(cors());
@@ -30,7 +30,6 @@ try {
 // defining routes
 app.use("/book", bookRoute);
 app.use("/user", userRoute);
-
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 });
