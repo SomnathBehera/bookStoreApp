@@ -29,7 +29,6 @@ export const signup = async (req, res) => {
     }
 };
 
-
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -56,7 +55,6 @@ export const login = async (req, res) => {
 export const submit = async (req, res) => {
     try {
         const { fullname, companyname, email, phnumber, message } = req.body;
-        console.log("sddsdsdsdsd",req.body);
         const createdUserContact = new Conatct({
             fullname,
             companyname,
@@ -64,7 +62,6 @@ export const submit = async (req, res) => {
             phnumber,
             message
         });
-        console.log("erewrqea",createdUserContact)
         await createdUserContact.save();
         res.status(201).json({
             message: "Thanks For Contacting Us",
