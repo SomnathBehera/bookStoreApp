@@ -1,9 +1,9 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import Login from "./Login";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
+
 function Signup() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -14,43 +14,55 @@ function Signup() {
     formState: { errors },
   } = useForm();
 
+  const loginAfterSignup = async (email, password) => {
+    const userInfo = { email, password };
+    try {
+      const loginRes = await axios.post("http://localhost:4001/user/login", userInfo);
+      if (loginRes.data) {
+        // toast.success("Logged in Successfully");
+        localStorage.setItem("Users", JSON.stringify(loginRes.data.user));
+        navigate(from, { replace: true });
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      }
+    } catch (err) {
+      if (err.response) {
+        toast.error("Error: " + err.response.data.message);
+      }
+    }
+  };
+
   const onSubmit = async (data) => {
     const userInfo = {
       fullname: data.fullname,
       email: data.email,
       password: data.password,
-    };  
-    await axios
-      .post("http://localhost:4001/user/signup", userInfo)
-      .then((res) => {
-        console.log(res.data);
-        if (res.data) {
-          toast.success("Signup Successfully");
-          navigate(from, { replace: true });
-        }
+    };
+    try {
+      const res = await axios.post("http://localhost:4001/user/signup", userInfo);
+      if (res.data) {
+        // toast.success("Signup Successfully");
         localStorage.setItem("Users", JSON.stringify(res.data.user));
-      })
-      .catch((err) => {
-        if (err.response) {
-          console.log(err);
-          toast.error("Error: " + err.response.data.message);
-        }
-      });
+
+        await loginAfterSignup(data.email, data.password);
+      }
+    } catch (err) {
+      if (err.response) {
+        toast.error("Error: " + err.response.data.message);
+      }
+    }
   };
+
   return (
     <>
       <div className="flex h-screen items-center justify-center">
         <div className=" w-[600px] flex justify-center">
           <div className="modal-box">
             <form onSubmit={handleSubmit(onSubmit)} method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <Link
-                to="/"
-                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              >
+              <Link to="/" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
                 ✕
               </Link>
-
               <h3 className="font-bold text-lg">Signup</h3>
               <div className="mt-4 space-y-2">
                 <span>Name</span>
@@ -62,13 +74,8 @@ function Signup() {
                   {...register("fullname", { required: true })}
                 />
                 <br />
-                {errors.fullname && (
-                  <span className="text-sm text-red-500">
-                    This field is required
-                  </span>
-                )}
+                {errors.fullname && <span className="text-sm text-red-500">This field is required</span>}
               </div>
-              {/* Email */}
               <div className="mt-4 space-y-2">
                 <span>Email</span>
                 <br />
@@ -79,35 +86,24 @@ function Signup() {
                   {...register("email", { required: true })}
                 />
                 <br />
-                {errors.email && (
-                  <span className="text-sm text-red-500">
-                    This field is required
-                  </span>
-                )}
+                {errors.email && <span className="text-sm text-red-500">This field is required</span>}
               </div>
-              {/* Password */}
               <div className="mt-4 space-y-2">
                 <span>Password</span>
                 <br />
                 <input
-                  type="text"
+                  type="password"
                   placeholder="Enter your password"
                   className="w-80 px-3 py-1 border rounded-md outline-none"
                   {...register("password", { required: true })}
                 />
                 <br />
-                {errors.password && (
-                  <span className="text-sm text-red-500">
-                    This field is required
-                  </span>
-                )}
+                {errors.password && <span className="text-sm text-red-500">This field is required</span>}
               </div>
-              {/* Button */}
               <div className="flex justify-start mt-4">
                 <button className="bg-pink-500 text-white rounded-md px-3 py-1 hover:bg-pink-700 duration-200">
                   Signup
                 </button>
-               
               </div>
             </form>
           </div>
