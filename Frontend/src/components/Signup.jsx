@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
+import Loader from "../../common/Loader";
 
 function Signup() {
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
+  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -15,16 +17,16 @@ function Signup() {
   } = useForm();
 
   const loginAfterSignup = async (email, password) => {
-    const userInfo = { email, password };
     try {
-      const loginRes = await axios.post("http://localhost:4001/user/login", userInfo);
+      const loginRes = await axios.post("http://localhost:4001/user/login", { email, password });
       if (loginRes.data) {
-        // toast.success("Logged in Successfully");
+        // Save user info and access token
         localStorage.setItem("Users", JSON.stringify(loginRes.data.user));
-        navigate(from, { replace: true });
+        localStorage.setItem("accessToken", loginRes.data.token); // Save the token
         setTimeout(() => {
           window.location.reload();
-        }, 3000);
+        }, 1000);
+        navigate(from, { replace: true });
       }
     } catch (err) {
       if (err.response) {
@@ -34,6 +36,7 @@ function Signup() {
   };
 
   const onSubmit = async (data) => {
+    setLoading(true);
     const userInfo = {
       fullname: data.fullname,
       email: data.email,
@@ -42,23 +45,31 @@ function Signup() {
     try {
       const res = await axios.post("http://localhost:4001/user/signup", userInfo);
       if (res.data) {
-        // toast.success("Signup Successfully");
+        // Save user info and check if token is included
         localStorage.setItem("Users", JSON.stringify(res.data.user));
-
-        await loginAfterSignup(data.email, data.password);
+        if (res.data.token) {
+          localStorage.setItem("accessToken", res.data.token); // Save the token if included in signup response
+          navigate(from, { replace: true });
+        } else {
+          await loginAfterSignup(data.email, data.password); // Fallback to login if no token in signup response
+        }
       }
     } catch (err) {
       if (err.response) {
         toast.error("Error: " + err.response.data.message);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <>
-      <div className="flex h-screen items-center justify-center">
-        <div className=" w-[600px] flex justify-center">
-          <div className="modal-box">
+    <div className="flex h-screen items-center justify-center">
+      <div className="w-[600px] flex justify-center">
+        <div className="modal-box">
+          {loading ? (
+            <Loader />
+          ) : (
             <form onSubmit={handleSubmit(onSubmit)} method="dialog">
               <Link to="/" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
                 ✕
@@ -101,15 +112,18 @@ function Signup() {
                 {errors.password && <span className="text-sm text-red-500">This field is required</span>}
               </div>
               <div className="flex justify-start mt-4">
-                <button className="bg-pink-500 text-white rounded-md px-3 py-1 hover:bg-pink-700 duration-200">
+                <button
+                  type="submit"
+                  className="bg-pink-500 text-white rounded-md px-3 py-1 hover:bg-pink-700 duration-200"
+                >
                   Signup
                 </button>
               </div>
             </form>
-          </div>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

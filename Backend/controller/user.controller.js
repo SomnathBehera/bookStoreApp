@@ -1,6 +1,10 @@
 import User from "../model/user.model.js";
-import Conatct from "../model/contact.model.js";
+import Contact from "../model/contact.model.js";
 import bcryptjs from "bcryptjs";
+import jwt from "jsonwebtoken"; // Import jsonwebtoken
+
+const JWT_SECRET = 'your_secret_key'; // Replace with your secret key
+
 export const signup = async (req, res) => {
     try {
         const { fullname, email, password } = req.body;
@@ -15,6 +19,7 @@ export const signup = async (req, res) => {
             password: hashPassword,
         });
         await createdUser.save();
+
         res.status(201).json({
             message: "User created successfully",
             user: {
@@ -33,19 +38,27 @@ export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        const isMatch = await bcryptjs.compare(password, user.password);
-        if (!user || !isMatch) {
+        if (!user) {
             return res.status(400).json({ message: "Invalid username or password" });
-        } else {
-            res.status(200).json({
-                message: "Login successful",
-                user: {
-                    _id: user._id,
-                    fullname: user.fullname,
-                    email: user.email,
-                },
-            });
         }
+
+        const isMatch = await bcryptjs.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Invalid username or password" });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '2m' });
+
+        res.status(200).json({
+            message: "Login successful",
+            user: {
+                _id: user._id,
+                fullname: user.fullname,
+                email: user.email,
+            },
+            token // Send token in response
+        });
     } catch (error) {
         console.log("Error: " + error.message);
         res.status(500).json({ message: "Internal server error" });
@@ -55,7 +68,7 @@ export const login = async (req, res) => {
 export const submit = async (req, res) => {
     try {
         const { fullname, companyname, email, phnumber, message } = req.body;
-        const createdUserContact = new Conatct({
+        const createdUserContact = new Contact({
             fullname,
             companyname,
             email,
@@ -71,4 +84,3 @@ export const submit = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
-
